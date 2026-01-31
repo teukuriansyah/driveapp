@@ -1,6 +1,7 @@
-import { View, Text, TextInput } from 'react-native'
+import { View, Text, TextInput, Pressable } from 'react-native'
 import { useState } from 'react'
 import useGeolocation from "../hooks/useGeolocation"
+import AntDesign from '@expo/vector-icons/AntDesign';
 import MapsLayout from './MapsLayout'
 
 export default function bike() {
@@ -54,6 +55,13 @@ export default function bike() {
                 </View>
             </View> :
             <>
+              <View className="flex-row items-center gap-3">
+                <Pressable onPress={() => setPickUp("")}>
+                  <AntDesign name="arrow-left" size={24} color="black" />
+                </Pressable>
+                <Text className="text-lg font-semibold p-4">Select your ride</Text>
+              </View>
+              <View>
                 <View className='flex-row justify-between p-4'>
                     <Text>Drive Bike</Text>
                     <Text>Rp. {price < 10000 ? numberWithCommas(10000) : numberWithCommas(price)}</Text>
@@ -66,6 +74,7 @@ export default function bike() {
                     <Text>Drive Bike Hemat</Text>
                     <Text>Rp. {price < 10000 ? numberWithCommas(10000 - (10000 * 0.1)) : numberWithCommas(price - (price * 0.1))}</Text>
                 </View>
+              </View>
             </>
         }
     </MapsLayout>

@@ -4,11 +4,15 @@ import MapView, { Marker, Polyline } from 'react-native-maps';
 
 export default function Maps(props: any) {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState<number>(0)
   const [routeCoords, setRouteCoords] = useState<any[]>([]);
   const mapRef = useRef<MapView>(null);
 
   useEffect(() => {
-    const showSubscription = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
+    const showSubscription = Keyboard.addListener('keyboardDidShow', (e) => {
+      setKeyboardVisible(true)
+      setKeyboardHeight(e.endCoordinates.height)
+    });
     const hideSubscription = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
     return () => {
       showSubscription.remove();
@@ -87,7 +91,7 @@ export default function Maps(props: any) {
           </MapView>
 
           <ScrollView 
-            className={`absolute bottom-0 bg-white w-full gap-4 p-4 ${isKeyboardVisible ? 'h-1/2' : 'h-1/3'}`}
+            className={`absolute bottom-0 bg-white w-full gap-4 p-4 ${isKeyboardVisible ? `h-3/5` : 'h-2/5'}`}
             style={{ borderTopLeftRadius: 20, borderTopRightRadius: 20, elevation: 10 }}
           >
             {props.children}
