@@ -1,44 +1,99 @@
-import { View, Text, Pressable, ScrollView, Keyboard } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { useState,useEffect } from "react"
-import { useRouter } from 'expo-router'
-import MapView, { Marker } from 'react-native-maps';
+import { View, Text, ScrollView, Keyboard } from 'react-native'
+import { useState, useEffect, useRef } from "react"
+import MapView, { Marker, Polyline } from 'react-native-maps';
 
-export default function maps(props:any) {
-  const router = useRouter();
+export default function Maps(props: any) {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const [routeCoords, setRouteCoords] = useState<any[]>([]);
+  const mapRef = useRef<MapView>(null);
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
     const hideSubscription = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
-
     return () => {
       showSubscription.remove();
       hideSubscription.remove();
     };
   }, []);
-    
+
+  const getRoute = async (start: any, end: any) => {
+    try {
+      const url = `https://router.project-osrm.org/route/v1/driving/${start.longitude},${start.latitude};${end.longitude},${end.latitude}?overview=full&geometries=geojson`;
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data.routes && data.routes.length > 0) {
+        const points = data.routes[0].geometry.coordinates.map((coord: any) => ({
+          latitude: coord[1],
+          longitude: coord[0],
+        }));
+        setRouteCoords(points);
+
+        mapRef.current?.fitToCoordinates(points, {
+          edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
+          animated: true,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    if (props.location && props.pickup) {
+      getRoute(props.location, props.pickup);
+    } else {
+      setRouteCoords([]);
+    }
+  }, [props.pickup, props.location]);
+
   return (
-    <>
-        {props.location === null ? <View className="p-4"><Text>Loading...</Text></View> :
+    <View style={{ flex: 1 }}>
+      {props.location === null ? (
+        <View className="p-4"><Text>Loading...</Text></View>
+      ) : (
         <>
-            <MapView 
-                style={{ width:'100%', height:'100%' }} 
-                initialRegion={{
-                    latitude: props.location.latitude,
-                    longitude: props.location.longitude,
-                    latitudeDelta: 0.01,
-                    longitudeDelta: 0.01,
-                }}>
-                {location && (
-                <Marker coordinate={{ latitude: props.location.latitude, longitude: props.location.longitude }} title="You are here" />
-                )}
-            </MapView>
-            <ScrollView className={`absolute bottom-0 bg-white h-1/3 w-full gap-4 ${isKeyboardVisible ? 'mb-24' : ''}`}>
-              {props.children}
-            </ScrollView>
+          <MapView
+            ref={mapRef}
+            style={{ width: '100%', height: '100%' }}
+            initialRegion={{
+              latitude: props.location.latitude,
+              longitude: props.location.longitude,
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01,
+            }}
+          >
+            <Marker 
+              coordinate={props.location} 
+              title="You are here" 
+              pinColor='blue' 
+            />
+
+            {props.pickup && (
+              <Marker 
+                coordinate={props.pickup} 
+                title="Pick up location" 
+                pinColor='red' 
+              />
+            )}
+
+            {routeCoords.length > 0 && (
+              <Polyline
+                coordinates={routeCoords}
+                strokeColor="#0000FF"
+                strokeWidth={4}
+              />
+            )}
+          </MapView>
+
+          <ScrollView 
+            className={`absolute bottom-0 bg-white w-full gap-4 p-4 ${isKeyboardVisible ? 'h-1/2' : 'h-1/3'}`}
+            style={{ borderTopLeftRadius: 20, borderTopRightRadius: 20, elevation: 10 }}
+          >
+            {props.children}
+          </ScrollView>
         </>
-        }
-    </>
+      )}
+    </View>
   )
 }
