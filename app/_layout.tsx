@@ -7,6 +7,7 @@ export default function RootLayout() {
     <Stack>
       <Stack.Screen name="index" options={{headerShown: false,}}/>
       <Stack.Screen name="bike" options={{header: () => <HeaderMaps />}}/>
+      <Stack.Screen name="car" options={{header: () => <HeaderMaps />}}/>
     </Stack>
   )
 }

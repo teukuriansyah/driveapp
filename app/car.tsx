@@ -4,7 +4,7 @@ import useGeolocation from "../hooks/useGeolocation"
 import AntDesign from '@expo/vector-icons/AntDesign';
 import MapsLayout from './MapsLayout'
 
-export default function bike() {
+export default function car() {
   const location = useGeolocation()
   const [input, onChangeInput] = useState('');
   const [pickUp, setPickUp] = useState<any>('');
@@ -22,7 +22,7 @@ export default function bike() {
     const result = {latitude:parseFloat(data[0].lat), longitude:parseFloat(data[0].lon)}
     const distance:any = countDistance(location.latitude, location.longitude, result.latitude, result.longitude)
     setPickUp(result)
-    setPrice(Math.round(distance*3000))
+    setPrice(Math.round(distance*5000))
   }
   
   const countDistance = (lat1:number, lon1:number, lat2:number, lon2:number) => {
@@ -64,24 +64,24 @@ export default function bike() {
               <View>
                 <View className='flex-row justify-between p-4 items-center'>
                     <View className='flex-row items-center gap-3'>
-                      <Image source={require("../assets/images/bike2.png")} className="w-16 h-16 mb-2" />
-                      <Text className="font-semibold">Drive Bike</Text>
+                      <Image source={require("../assets/images/car2.png")} className="w-16 h-16 mb-2" />
+                      <Text className="font-semibold">Drive Car</Text>
                     </View>
-                    <Text>Rp. {price < 10000 ? numberWithCommas(10000) : numberWithCommas(price)}</Text>
+                    <Text>Rp. {price < 20000 ? numberWithCommas(20000) : numberWithCommas(price)}</Text>
                 </View>
                 <View className='flex-row justify-between p-4 items-center'>
                     <View className='flex-row items-center gap-3'>
-                      <Image source={require("../assets/images/bike2.png")} className="w-16 h-16 mb-2" />
-                      <Text className="font-semibold">Drive Bike Cepat</Text>
+                      <Image source={require("../assets/images/car2.png")} className="w-16 h-16 mb-2" />
+                      <Text className="font-semibold">Drive Car Cepat</Text>
                     </View>
-                    <Text>Rp. {price < 10000 ? numberWithCommas(10000 + (10000 * 0.1)) : numberWithCommas(price + (price * 0.1))}</Text>
+                    <Text>Rp. {price < 10000 ? numberWithCommas(20000 + (20000 * 0.1)) : numberWithCommas(price + (price * 0.1))}</Text>
                 </View>
                 <View className='flex-row justify-between p-4 items-center'>
                     <View className='flex-row items-center gap-3'>
-                      <Image source={require("../assets/images/bike2.png")} className="w-16 h-16 mb-2" />
-                      <Text className="font-semibold">Drive Bike Hemat</Text>
+                      <Image source={require("../assets/images/car2.png")} className="w-16 h-16 mb-2" />
+                      <Text className="font-semibold">Drive Car Hemat</Text>
                     </View>
-                    <Text>Rp. {price < 10000 ? numberWithCommas(10000 - (10000 * 0.1)) : numberWithCommas(price - (price * 0.1))}</Text>
+                    <Text>Rp. {price < 20000 ? numberWithCommas(20000 - (20000 * 0.1)) : numberWithCommas(price - (price * 0.1))}</Text>
                 </View>
               </View>
             </>

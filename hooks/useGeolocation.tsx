@@ -11,7 +11,8 @@ export default function useGeolocation() {
         return;
       }
       let location = await Location.getCurrentPositionAsync({});
-      setLocation({latitude: location?.coords?.latitude, longitude: location?.coords?.longitude});
+      // setLocation({latitude: location?.coords?.latitude, longitude: location?.coords?.longitude});
+      setLocation({latitude:-6.157730303565986, longitude:106.70434990997822})
     }
 
     useEffect(() => {
