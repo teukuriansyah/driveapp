@@ -1,45 +1,40 @@
-import { View, Text, Pressable, ScrollView } from 'react-native'
-import { useEffect, useState } from 'react'
+import { View, Text, Pressable, ScrollView, Keyboard } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { useState,useEffect } from "react"
 import { useRouter } from 'expo-router'
 import MapView, { Marker } from 'react-native-maps';
-import * as Location from 'expo-location';
 
 export default function maps(props:any) {
-    const [location, setLocation] = useState<any>(null);
-    const [errorMsg, setErrorMsg] = useState<string | null>(null);
-    const router = useRouter();
+  const router = useRouter();
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
-    async function getCurrentLocation() {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
-        return;
-      }
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation({latitude: location?.coords?.latitude, longitude: location?.coords?.longitude});
-    }
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
+    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
 
-    useEffect(() => {
-        getCurrentLocation();
-    }, []);
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
+    
   return (
     <>
-        {location === null ? <View className="p-4"><Text>Loading...</Text></View> :
+        {props.location === null ? <View className="p-4"><Text>Loading...</Text></View> :
         <>
             <MapView 
                 style={{ width:'100%', height:'100%' }} 
                 initialRegion={{
-                    latitude: location.latitude,
-                    longitude: location.longitude,
+                    latitude: props.location.latitude,
+                    longitude: props.location.longitude,
                     latitudeDelta: 0.01,
                     longitudeDelta: 0.01,
                 }}>
                 {location && (
-                <Marker coordinate={{ latitude: location.latitude, longitude: location.longitude }} title="You are here" />
+                <Marker coordinate={{ latitude: props.location.latitude, longitude: props.location.longitude }} title="You are here" />
                 )}
             </MapView>
-            <ScrollView className='absolute bottom-0 bg-white h-1/3 w-full gap-4'>
+            <ScrollView className={`absolute bottom-0 bg-white h-1/3 w-full gap-4 ${isKeyboardVisible ? 'mb-24' : ''}`}>
               {props.children}
             </ScrollView>
         </>

@@ -1,29 +1,33 @@
 import { View, Text, TextInput, Keyboard } from 'react-native'
 import React, { useEffect, useState } from 'react'
+import useGeolocation from "../hooks/useGeolocation.tsx"
 import MapsLayout from './MapsLayout'
 
 export default function bike() {
-  const [pickUp, onChangePickUp] = useState('');
-  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const location = useGeolocation()
+  const [input, onChangeInput] = useState('');
+  const [pickUp, setPickUp] = useState('');
 
-  useEffect(() => {
-    const showSubscription = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
-    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
-
-    return () => {
-      showSubscription.remove();
-      hideSubscription.remove();
-    };
-  }, []);
+  const submitLocation = async() => {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(input)}&limit=1`,{
+        headers:{
+          'User-Agent':'DriveApp'
+        }
+      }
+    );
+    const data = await response.json();
+    console.log(data)
+  }
   return (
-    <MapsLayout>
+    <MapsLayout location={location}>
         {pickUp === '' ?
-            <View className={`${isKeyboardVisible ? 'mb-40' : ''}`}>
+            <View>
                 <View>
                     <Text className='p-4 text-lg font-semibold'>Where do you want to go?</Text>
                 </View>
                 <View className="px-4">
-                    <TextInput value={pickUp} onChangeText={onChangePickUp} placeholder="Pick up location" />
+                    <TextInput value={input} onChangeText={onChangeInput} placeholder="Pick up location" returnKeyType="search" onSubmitEditing={submitLocation}/>
                 </View>
             </View> :
             <>
